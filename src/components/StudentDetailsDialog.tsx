@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { formatDateInput } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
 interface StudentDetailsDialogProps {
@@ -149,10 +150,11 @@ const StudentDetailsDialog = ({
               <Input
                 id="dataPagamento"
                 value={dataPagamento}
-                onChange={(e) => setDataPagamento(e.target.value)}
+                onChange={(e) => setDataPagamento(formatDateInput(e.target.value))}
                 placeholder="DD/MM/YYYY"
                 type="text"
                 className={isDateRequired && !dataPagamento ? "border-red-500" : ""}
+                maxLength={10}
               />
               {isDateRequired && (
                 <p className="text-xs text-amber-600">

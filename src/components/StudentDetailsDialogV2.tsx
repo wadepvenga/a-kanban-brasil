@@ -17,6 +17,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import FollowUpManager from "./FollowUpManager";
 import { Lock, Edit3 } from "lucide-react";
+import { formatDateInput } from "@/lib/utils";
+import { addFollowUp } from "@/services/supabaseService";
 
 
 interface StudentDetailsDialogV2Props {
@@ -41,6 +43,7 @@ const StudentDetailsDialogV2 = ({
   const [isDateRequired, setIsDateRequired] = useState(false);
   const [followUps, setFollowUps] = useState<FollowUp[]>([]);
   const [isEditingObservacoes, setIsEditingObservacoes] = useState(false);
+  const [joyLastFollow, setJoyLastFollow] = useState("");
   
   // Estados para edição de campos do aluno
   const [isEditingStudent, setIsEditingStudent] = useState(false);
@@ -88,6 +91,7 @@ const StudentDetailsDialogV2 = ({
     
     // Date is required when current status is "resposta-recebida" and we want to move to "pagamento-feito"
     setIsDateRequired(student.status === "resposta-recebida");
+    setJoyLastFollow("");
   }, [student]);
 
   // 📱 CORREÇÃO MOBILE - Follow-ups não apareciam no mobile - 18/01/2025
@@ -104,7 +108,7 @@ const StudentDetailsDialogV2 = ({
     }
   }, [isOpen, student.id, student.followUps]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Parse valor to number
     const parsedValor = parseFloat(editedValor) || 0;
     
@@ -122,6 +126,19 @@ const StudentDetailsDialogV2 = ({
       followUps
     };
     
+    // Se houver um último follow do Joy preenchido, salvar como follow-up
+    if (joyLastFollow.trim()) {
+      try {
+        const created = await addFollowUp(student.id, joyLastFollow.trim(), "Joy");
+        if (created) {
+          setFollowUps(prev => [...prev, created]);
+        }
+      } catch (e) {
+        console.error("Erro ao salvar follow do Joy:", e);
+      }
+      setJoyLastFollow("");
+    }
+
     onUpdate(updatedStudent);
     onClose();
   };
@@ -353,9 +370,10 @@ const StudentDetailsDialogV2 = ({
                         <Input
                           id="editedDataVencimento"
                           value={editedDataVencimento}
-                          onChange={(e) => setEditedDataVencimento(e.target.value)}
+                          onChange={(e) => setEditedDataVencimento(formatDateInput(e.target.value))}
                           placeholder="DD/MM/YYYY"
                           className={validationErrors.dataVencimento ? "border-red-500" : ""}
+                          maxLength={10}
                         />
                         {validationErrors.dataVencimento && (
                           <p className="text-xs text-red-500 mt-1">{validationErrors.dataVencimento}</p>
@@ -499,16 +517,30 @@ const StudentDetailsDialogV2 = ({
                 <Input
                   id="dataPagamento"
                   value={dataPagamento}
-                  onChange={(e) => setDataPagamento(e.target.value)}
+                  onChange={(e) => setDataPagamento(formatDateInput(e.target.value))}
                   placeholder="DD/MM/YYYY"
                   type="text"
                   className={isDateRequired && !dataPagamento ? "border-red-500" : ""}
+                  maxLength={10}
                 />
                 {isDateRequired && (
                   <p className="text-xs text-amber-600">
                     A data de pagamento é obrigatória para mover o aluno para "Pagamento Realizado"
                   </p>
                 )}
+              </div>
+
+              {/* Último follow do Joy */}
+              <div className="space-y-2">
+                <Label htmlFor="joyLastFollow">Último follow do Joy</Label>
+                <Textarea
+                  id="joyLastFollow"
+                  value={joyLastFollow}
+                  onChange={(e) => setJoyLastFollow(e.target.value)}
+                  rows={3}
+                  placeholder="Descreva o último follow realizado pelo Joy..."
+                />
+                <p className="text-xs text-gray-500">Este texto será salvo como um novo follow-up em nome de Joy ao clicar em Salvar.</p>
               </div>
             </TabsContent>
             
