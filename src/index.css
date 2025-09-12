@@ -120,3 +120,8 @@
 .dashboard-card:hover {
   transform: translateY(-5px);
 }
+
+/* Default application zoom */
+html {
+  zoom: 0.8;
+}
