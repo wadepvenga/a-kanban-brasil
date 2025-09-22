@@ -448,7 +448,7 @@ const StudentDetailsDialogV2 = ({
           <Separator className="my-4" />
 
           {/* Tabs para organizar o conteúdo */}
-          <Tabs defaultValue="details" className="w-full">
+          <Tabs defaultValue="followups" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="details">Dados & Observações</TabsTrigger>
               <TabsTrigger value="followups">Follow-ups</TabsTrigger>
@@ -530,17 +530,18 @@ const StudentDetailsDialogV2 = ({
                 )}
               </div>
 
-              {/* Último follow do Joy */}
+              {/* Último follow do Joy (campo de data) */}
               <div className="space-y-2">
                 <Label htmlFor="joyLastFollow">Último follow do Joy</Label>
-                <Textarea
+                <Input
                   id="joyLastFollow"
                   value={joyLastFollow}
-                  onChange={(e) => setJoyLastFollow(e.target.value)}
-                  rows={3}
-                  placeholder="Descreva o último follow realizado pelo Joy..."
+                  onChange={(e) => setJoyLastFollow(formatDateInput(e.target.value))}
+                  placeholder="DD/MM/YYYY"
+                  type="text"
+                  maxLength={10}
                 />
-                <p className="text-xs text-gray-500">Este texto será salvo como um novo follow-up em nome de Joy ao clicar em Salvar.</p>
+                <p className="text-xs text-gray-500">Informe a data no formato DD/MM/AAAA. Um follow-up automático será criado em nome de Joy ao salvar.</p>
               </div>
             </TabsContent>
             
