@@ -181,6 +181,10 @@ export const ensureMaioAvailable = async (): Promise<void> => {
 // Importar alunos do mês anterior (exceto pagamento realizado) para o novo mês
 export const importStudentsFromPreviousMonth = async (newMonth: string): Promise<void> => {
   try {
+    // 1. Verificar se já existem alunos no novo mês para evitar duplicação total
+    const existingStudentsInNewMonth = await getStudents(newMonth);
+    const existingNames = new Set(existingStudentsInNewMonth.map(s => s.nome.toLowerCase().trim()));
+
     // Extrair mês e ano do novo mês
     const [newMonthNum, newYear] = newMonth.split("-");
     let prevMonthNum = parseInt(newMonthNum) - 1;
@@ -205,10 +209,24 @@ export const importStudentsFromPreviousMonth = async (newMonth: string): Promise
       return;
     }
 
-    // Filtrar alunos que não estão em pagamento realizado
-    const studentsToImport = prevStudents.filter(s => s.status !== "pagamento-feito");
+    // Filtrar alunos que não estão em pagamento realizado E que ainda não existem no novo mês
+    const studentsToImport = prevStudents.filter(s => {
+      const isPaid = s.status === "pagamento-feito";
+      const alreadyExists = existingNames.has(s.nome.toLowerCase().trim());
+      
+      if (alreadyExists) {
+        console.log(`⏭️ Aluno ${s.nome} já existe no mês ${newMonth}, pulando...`);
+      }
+      
+      return !isPaid && !alreadyExists;
+    });
+
     if (studentsToImport.length === 0) {
-      toast.info("Nenhum aluno para importar do mês anterior");
+      if (existingStudentsInNewMonth.length > 0) {
+        toast.info("Todos os alunos elegíveis já foram importados para este mês.");
+      } else {
+        toast.info("Nenhum aluno para importar do mês anterior");
+      }
       return;
     }
 
