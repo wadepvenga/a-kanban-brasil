@@ -417,11 +417,8 @@ const KanbanBoard = ({ students, onStudentUpdate, filteredStudents, isFiltered, 
       setLocalStudents(prev => prev.filter(student => student.id !== studentId));
       
       // Update parent component state
-      const updatedStudents = students.filter(student => student.id !== studentId);
-      onStudentUpdate({
-        ...students.find(s => s.id === studentId)!,
-        id: studentId // This is a hack to identify the deleted student in the parent component
-      });
+      // Index.tsx identifies a delete by an object containing only the id
+      onStudentUpdate({ id: studentId } as Student);
       
       toast.success("Aluno excluído com sucesso", {
         description: "O aluno foi removido do sistema."

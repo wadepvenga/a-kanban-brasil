@@ -823,14 +823,20 @@ export const deleteStudent = async (studentId: string): Promise<void> => {
     }
     
     // Now delete the student
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('students')
       .delete()
-      .eq('id', studentId);
-    
+      .eq('id', studentId)
+      .select('id');
+
     if (error) {
       console.error("Error deleting student:", error);
       throw error;
+    }
+
+    // RLS can block the delete without returning an error (0 rows affected)
+    if (!data || data.length === 0) {
+      throw new Error(`Student ${studentId} was not deleted (no rows affected - check RLS policies)`);
     }
     
     console.log(`Student ${studentId} deleted successfully`);

@@ -43,7 +43,11 @@ const MonthSelector = ({ onMonthChange, value }: MonthSelectorProps) => {
           
           // Only auto-select if no external value is provided and no month is currently selected
           if (!value && !selectedMonth) {
-            const currentMonth = availableMonths[0].month_value;
+            // Prefer the current calendar month (MM-YYYY), falling back to the first available
+            const now = new Date();
+            const todayMonth = `${String(now.getMonth() + 1).padStart(2, "0")}-${now.getFullYear()}`;
+            const currentMonth = availableMonths.find(m => m.month_value === todayMonth)?.month_value
+              ?? availableMonths[0].month_value;
             setSelectedMonth(currentMonth);
             onMonthChange(currentMonth);
           }
