@@ -32,7 +32,7 @@ const KanbanBoard = ({ students, onStudentUpdate, filteredStudents, isFiltered, 
     today.setHours(0, 0, 0, 0);
     
     return (student: Student): number => {
-      if (student.status === "pagamento-feito" || !student.dataVencimento) {
+      if (student.status === "pagamento-feito" || student.status === "rescisao-trancamento" || !student.dataVencimento) {
         return student.diasAtraso || 0;
       }
       
@@ -110,7 +110,8 @@ const KanbanBoard = ({ students, onStudentUpdate, filteredStudents, isFiltered, 
     { id: "inadimplente", title: "Alunos Inadimplentes", color: "bg-kanban-overdue" },
     { id: "mensagem-enviada", title: "Mensagem Enviada", color: "bg-kanban-sent" },
     { id: "resposta-recebida", title: "Resposta Recebida", color: "bg-kanban-replied" },
-    { id: "pagamento-feito", title: "Pagamento Realizado", color: "bg-kanban-paid" }
+    { id: "pagamento-feito", title: "Pagamento Realizado", color: "bg-kanban-paid" },
+    { id: "rescisao-trancamento", title: "Rescisão/Trancamento", color: "bg-kanban-terminated" }
   ];
 
   // Mapeamento do status para o status anterior
@@ -118,7 +119,8 @@ const KanbanBoard = ({ students, onStudentUpdate, filteredStudents, isFiltered, 
     "inadimplente": "inadimplente", // Primeiro status, não tem anterior
     "mensagem-enviada": "inadimplente",
     "resposta-recebida": "mensagem-enviada",
-    "pagamento-feito": "resposta-recebida"
+    "pagamento-feito": "resposta-recebida",
+    "rescisao-trancamento": "inadimplente"
   };
 
   // Agrupar estudantes por status
@@ -126,7 +128,8 @@ const KanbanBoard = ({ students, onStudentUpdate, filteredStudents, isFiltered, 
     "inadimplente": [],
     "mensagem-enviada": [],
     "resposta-recebida": [],
-    "pagamento-feito": []
+    "pagamento-feito": [],
+    "rescisao-trancamento": []
   };
 
   studentsToShow.forEach(student => {
@@ -217,7 +220,7 @@ const KanbanBoard = ({ students, onStudentUpdate, filteredStudents, isFiltered, 
     // Permite movimentação se:
     // - Existe pelo menos 1 follow-up nos dados carregados OU
     // - Campo antigo está preenchido (compatibilidade)
-    if (student.status === "inadimplente") {
+    if (student.status === "inadimplente" && newStatus !== "rescisao-trancamento") {
       const hasFollowUps = (student.followUps && student.followUps.length > 0) || student.followUp?.trim();
       
       if (!hasFollowUps) {

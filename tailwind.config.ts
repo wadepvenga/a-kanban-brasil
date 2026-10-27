@@ -67,7 +67,8 @@ export default {
 					overdue: '#ef4444',
 					sent: '#f97316',
 					replied: '#3b82f6',
-					paid: '#22c55e'
+					paid: '#22c55e',
+					terminated: '#6b7280'
 				}
 			},
 			borderRadius: {

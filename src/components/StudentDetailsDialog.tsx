@@ -81,7 +81,8 @@ const StudentDetailsDialog = ({
       "inadimplente": "Inadimplente",
       "mensagem-enviada": "Mensagem Enviada",
       "resposta-recebida": "Resposta Recebida",
-      "pagamento-feito": "Pagamento Realizado"
+      "pagamento-feito": "Pagamento Realizado",
+      "rescisao-trancamento": "Rescisão/Trancamento"
     };
     
     return statusDisplayMap[status] || status;

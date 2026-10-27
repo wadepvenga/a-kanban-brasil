@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Student, Status } from "@/types";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ChevronLeft, Trash2 } from "lucide-react";
+import { ChevronRight, ChevronLeft, Trash2, UserX } from "lucide-react";
 import StudentDetailsDialogV2 from "@/components/StudentDetailsDialogV2";
 import { 
   AlertDialog,
@@ -40,7 +40,8 @@ const StudentCard = ({
     "inadimplente": "mensagem-enviada",
     "mensagem-enviada": "resposta-recebida",
     "resposta-recebida": "pagamento-feito",
-    "pagamento-feito": "pagamento-feito" // Last stage has no next
+    "pagamento-feito": "pagamento-feito", // Last stage has no next
+    "rescisao-trancamento": "rescisao-trancamento" // Terminal stage, reached via the dedicated button
   };
 
   // Status display names
@@ -48,7 +49,8 @@ const StudentCard = ({
     "inadimplente": "Inadimplente",
     "mensagem-enviada": "Mensagem Enviada",
     "resposta-recebida": "Resposta Recebida",
-    "pagamento-feito": "Pagamento Realizado"
+    "pagamento-feito": "Pagamento Realizado",
+    "rescisao-trancamento": "Rescisão/Trancamento"
   };
 
   // Get the next status
@@ -108,6 +110,7 @@ const StudentCard = ({
           student.status === "inadimplente" ? "#ef4444" : 
           student.status === "mensagem-enviada" ? "#f59e0b" : 
           student.status === "resposta-recebida" ? "#3b82f6" : 
+          student.status === "rescisao-trancamento" ? "#6b7280" : 
           "#10b981" 
       }}
     >
@@ -126,7 +129,7 @@ const StudentCard = ({
             <p className="text-xs text-gray-400">
               Vencimento: {student.dataVencimento}
             </p>
-            {student.diasAtraso > 0 && student.status !== "pagamento-feito" && (
+            {student.diasAtraso > 0 && student.status !== "pagamento-feito" && student.status !== "rescisao-trancamento" && (
               <p className="text-xs font-medium text-red-500">
                 {student.diasAtraso} dias em atraso
               </p>
@@ -139,6 +142,20 @@ const StudentCard = ({
           </div>
           
           <div className="flex items-center gap-1">
+            {student.status !== "pagamento-feito" && student.status !== "rescisao-trancamento" && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-7 w-7 text-gray-500 hover:text-gray-800"
+                title="Mover para Rescisão/Trancamento"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent opening the details dialog
+                  onStatusChange(student.id, "rescisao-trancamento");
+                }}
+              >
+                <UserX size={16} />
+              </Button>
+            )}
             <AlertDialog open={isConfirmDeleteOpen} onOpenChange={setIsConfirmDeleteOpen}>
               <AlertDialogTrigger asChild>
                 <Button 
@@ -197,7 +214,7 @@ const StudentCard = ({
         )}
         {student.status === "inadimplente" && <div />}
         
-        {student.status !== "pagamento-feito" && (
+        {student.status !== "pagamento-feito" && student.status !== "rescisao-trancamento" && (
           <Button 
             variant="outline" 
             size="sm" 

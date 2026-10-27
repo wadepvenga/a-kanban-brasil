@@ -211,7 +211,8 @@ export const importStudentsFromPreviousMonth = async (newMonth: string): Promise
 
     // Filtrar alunos que não estão em pagamento realizado E que ainda não existem no novo mês
     const studentsToImport = prevStudents.filter(s => {
-      const isPaid = s.status === "pagamento-feito";
+      // Paid and terminated (rescisão/trancamento) students are not carried over
+      const isPaid = s.status === "pagamento-feito" || s.status === "rescisao-trancamento";
       const alreadyExists = existingNames.has(s.nome.toLowerCase().trim());
       
       if (alreadyExists) {

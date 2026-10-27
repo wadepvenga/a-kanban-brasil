@@ -56,7 +56,7 @@ const Index = () => {
 
   // Calculate total in default
   const totalEmInadimplencia = students
-    .filter(s => s.status !== "pagamento-feito")
+    .filter(s => s.status !== "pagamento-feito" && s.status !== "rescisao-trancamento")
     .reduce((total, student) => total + student.valor, 0);
 
   // Force import from sheet

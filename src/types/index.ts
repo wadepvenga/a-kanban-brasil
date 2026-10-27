@@ -20,7 +20,7 @@ export interface Student {
   followUps?: FollowUp[]; // Nova estrutura para follow-ups com histórico
 }
 
-export type Status = "inadimplente" | "mensagem-enviada" | "resposta-recebida" | "pagamento-feito";
+export type Status = "inadimplente" | "mensagem-enviada" | "resposta-recebida" | "pagamento-feito" | "rescisao-trancamento";
 
 export interface StatusHistory {
   oldStatus: Status;
