@@ -489,7 +489,7 @@ const KanbanBoard = ({ students, onStudentUpdate, filteredStudents, isFiltered, 
         {columns.map(column => (
           <div 
             key={column.id}
-            className="flex-shrink-0 w-72 rounded-lg border shadow-sm"
+            className="flex-1 min-w-[16rem] rounded-lg border shadow-sm"
           >
             {/* Cabeçalho da coluna */}
             <div className={`p-3 rounded-t-lg ${column.color} text-white font-medium flex justify-between items-center`}>
